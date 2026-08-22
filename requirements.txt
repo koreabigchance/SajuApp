@@ -1,0 +1,4 @@
+flask
+korean-lunar-calendar
+google-genai
+python-dotenv

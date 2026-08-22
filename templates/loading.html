@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신령한 기운을 모으는 중 - 연서무당</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+            background: #0b0914;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; font-family: 'Pretendard', sans-serif;
+        }
+        .mystic-spinner {
+            position: relative; width: 140px; height: 140px; margin-bottom: 3.5rem;
+        }
+        .mystic-circle {
+            position: absolute; width: 100%; height: 100%;
+            border-radius: 50%; border: 2px solid transparent;
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.2);
+        }
+        .circle-1 { border-top-color: #c29d59; animation: spin 2s linear infinite; }
+        .circle-2 { border-right-color: #8b5cf6; animation: spin 3s linear infinite reverse; transform: scale(0.8); }
+        .circle-3 { border-bottom-color: #bda5d9; animation: spin 4s linear infinite; transform: scale(0.6); }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .loading-text {
+            font-size: 1.8rem; font-weight: 800; min-height: 2.5rem;
+            background: linear-gradient(90deg, #fceeb5, #c29d59, #8b5cf6);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+            opacity: 0; transition: opacity 0.5s ease;
+        }
+        .loading-text.visible { opacity: 1; }
+        .sub-text { margin-top: 1.5rem; color: #94a3b8; font-size: 1.1rem; }
+        
+        #stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    </style>
+</head>
+<body>
+    <canvas id="stars"></canvas>
+    
+    <div class="mystic-spinner">
+        <div class="mystic-circle circle-1"></div>
+        <div class="mystic-circle circle-2"></div>
+        <div class="mystic-circle circle-3"></div>
+    </div>
+    
+    <div style="text-align: center;">
+        <div id="loading-msg" class="loading-text visible">하늘의 별을 읽고 있습니다...</div>
+        <div class="sub-text">잠시만 기다려 주세요. 당신의 운명을 세밀하게 분석 중입니다.</div>
+    </div>
+
+    <form id="auto-form" action="/result" method="POST" style="display: none;">
+        {% for key, value in data.items() %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}">
+        {% endfor %}
+    </form>
+
+    <script>
+        // Starfield
+        const canvas = document.getElementById('stars');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.onresize = resize; resize();
+        for(let i=0; i<150; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*1.5, spd:Math.random()*0.5});
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "white";
+            stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill(); s.y += s.spd; if(s.y > canvas.height) s.y = 0; });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Messages
+        const messages = ["하늘의 별을 읽고 있습니다...", "당신의 사주 원국을 해독 중입니다...", "오행의 균형을 살피고 있습니다...", "생애 주기별 흐름을 분석 중입니다..."];
+        let idx = 0;
+        const msgEl = document.getElementById('loading-msg');
+        setInterval(() => {
+            msgEl.classList.remove('visible');
+            setTimeout(() => { idx = (idx + 1) % messages.length; msgEl.textContent = messages[idx]; msgEl.classList.add('visible'); }, 500);
+        }, 2500);
+
+        // Submit Delay
+        window.onload = () => { setTimeout(() => { document.getElementById('auto-form').submit(); }, 3500); };
+    </script>
+</body>
+</html>

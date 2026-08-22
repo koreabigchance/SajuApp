@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>연서무당 (Yeonseo Mudang) - {{ name }}님의 분석 결과</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header style="text-align: center; margin-bottom: 3rem;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, rgba(30,20,50,0.8), rgba(60,30,80,0.8)); border: 2px solid rgba(194, 157, 89, 0.4); box-shadow: 0 0 15px rgba(194, 157, 89, 0.3); margin-bottom: 1rem;">
+                <i class="fa-solid fa-moon" style="font-size: 1.5rem; color: #fceeb5;"></i>
+            </div>
+            <h2 class="text-gradient">연서무당 (Yeonseo Mudang)</h2>
+            <h1 style="font-size: 2.5rem; margin-top: 0.5rem;"><span style="color: var(--primary); font-size: 3rem; font-weight: 900; text-shadow: 0 0 15px rgba(194, 157, 89, 0.4);">{{ name }}</span>님의 심층 분석 결과</h1>
+            <p style="color: var(--text-muted);">{{ interp.core | safe }}</p>
+        </header>
+
+        <!-- 사주 원국표 -->
+        <div class="glass-card">
+            <h3 style="margin-bottom: 1.5rem;"><i class="fa-solid fa-table-cells-large"></i> 사주 원국표</h3>
+            <div style="overflow-x: auto;">
+                <table class="saju-table">
+                    <thead>
+                        <tr>
+                            <th style="width:10%">구분</th>
+                            <th style="width:22.5%">시주 (Hour)</th>
+                            <th style="width:22.5%">일주 (Day)</th>
+                            <th style="width:22.5%">월주 (Month)</th>
+                            <th style="width:22.5%">년주 (Year)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="label-cell">천간</td>
+                            <td class="{{ pillars.hour.gan_element }}"><span class="hanja">{{ pillars.hour.gan }}</span><div class="ten-god">{{ interp.ten_gods.hour.gan }}</div></td>
+                            <td class="{{ pillars.day.gan_element }} me-cell"><span class="hanja">{{ pillars.day.gan }}</span><div class="ten-god">나</div></td>
+                            <td class="{{ pillars.month.gan_element }}"><span class="hanja">{{ pillars.month.gan }}</span><div class="ten-god">{{ interp.ten_gods.month.gan }}</div></td>
+                            <td class="{{ pillars.year.gan_element }}"><span class="hanja">{{ pillars.year.gan }}</span><div class="ten-god">{{ interp.ten_gods.year.gan }}</div></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">지지</td>
+                            <td class="{{ pillars.hour.zhi_element }}"><span class="hanja">{{ pillars.hour.zhi }}</span><div class="ten-god">{{ interp.ten_gods.hour.zhi }}</div></td>
+                            <td class="{{ pillars.day.zhi_element }}"><span class="hanja">{{ pillars.day.zhi }}</span><div class="ten-god">{{ interp.ten_gods.day.zhi }}</div></td>
+                            <td class="{{ pillars.month.zhi_element }}"><span class="hanja">{{ pillars.month.zhi }}</span><div class="ten-god">{{ interp.ten_gods.month.zhi }}</div></td>
+                            <td class="{{ pillars.year.zhi_element }}"><span class="hanja">{{ pillars.year.zhi }}</span><div class="ten-god">{{ interp.ten_gods.year.zhi }}</div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 탭 네비게이션 -->
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'basic')">기본 해석</button>
+            <button class="tab-btn" onclick="openTab(event, 'ohaeng')">오행 & 십성</button>
+            <button class="tab-btn" onclick="openTab(event, 'gmhs')">인생의 흐름</button>
+            <button class="tab-btn" onclick="openTab(event, 'daewoon')">대운 (10년)</button>
+        </nav>
+
+        <!-- 탭 컨텐츠 1: 기본 해석 -->
+        <div id="basic" class="tab-content active">
+            <div class="glass-card" style="border-left: 6px solid var(--primary);">
+                <h3><i class="fa-solid fa-crown"></i> 평생사주 총평</h3>
+                <div class="md-content">{{ interp.total_summary }}</div>
+            </div>
+            <div class="glass-card">
+                <h3><i class="fa-solid fa-star"></i> 오늘의 운세</h3>
+                <p><strong>{{ interp.today_luck.date }} ({{ interp.today_luck.pillar }})</strong></p>
+                <div class="md-content">{{ interp.today_luck.desc }}</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="glass-card"><h3><i class="fa-solid fa-fingerprint"></i> 심층 성향</h3><div class="md-content">{{ interp.personality_deep }}</div></div>
+                <div class="glass-card"><h3><i class="fa-solid fa-briefcase"></i> 사회적 적성</h3><div class="md-content">{{ interp.social_analysis }}</div></div>
+                <div class="glass-card"><h3><i class="fa-solid fa-heart"></i> 애정운</h3><div class="md-content">{{ interp.love_romance }}</div></div>
+                <div class="glass-card"><h3><i class="fa-solid fa-coins"></i> 재물운 전략</h3><div class="md-content">{{ interp.wealth_strategy }}</div></div>
+            </div>
+        </div>
+
+        <!-- 탭 컨텐츠 2: 오행 -->
+        <div id="ohaeng" class="tab-content">
+            <div class="glass-card">
+                <h3>오행 균형</h3>
+                <canvas id="ohaengChart" style="max-height: 300px;"></canvas>
+            </div>
+            <div class="glass-card">
+                <h3>밸런스 분석</h3>
+                <div class="md-content">{{ interp.ohaeng_analysis.balance_text }}</div>
+                <hr style="margin: 1rem 0; border: 0; border-top: 1px solid rgba(0,0,0,0.1);">
+                <div class="md-content">{{ interp.advice }}</div>
+            </div>
+        </div>
+
+        <!-- 탭 컨텐츠 3: 인생의 흐름 -->
+        <div id="gmhs" class="tab-content">
+            <div class="timeline">
+                {% for p in ['year', 'month', 'day', 'hour'] %}
+                <div class="timeline-item">
+                    <div class="glass-card">
+                        <h3>{{ interp.gmhs[p].period }} <small>({{ interp.gmhs[p].pillar.gan }}{{ interp.gmhs[p].pillar.zhi }})</small></h3>
+                        <div class="md-content">{{ interp.gmhs[p].desc }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 탭 컨텐츠 4: 대운 -->
+        <div id="daewoon" class="tab-content">
+            <div class="glass-card"><h3>대운의 흐름</h3><div class="md-content">{{ interp.daewoon_trend }}</div></div>
+            <div class="dw-grid">
+                {% for dw in interp.daewoon %}
+                <div class="dw-card">
+                    <div style="color:var(--primary); font-weight:800;">{{ dw.age }}세~</div>
+                    <div class="dw-pillar"><span class="{{ dw.gan_element }}">{{ dw.gan }}</span><span class="{{ dw.zhi_element }}">{{ dw.zhi }}</span></div>
+                    <p style="font-size:0.8rem;">{{ dw.text }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;" id="action-buttons">
+            <a href="/" class="btn-primary" style="display: inline-block; text-decoration: none; max-width: 200px; text-align: center; padding: 1.2rem;">다시 입력하기</a>
+            <button onclick="downloadPDF()" class="btn-primary" style="display: inline-block; max-width: 250px; background: linear-gradient(135deg, rgba(194, 157, 89, 0.8) 0%, rgba(158, 123, 63, 0.8) 100%); border-color: #fceeb5; color: #fff;">
+                <i class="fa-solid fa-file-pdf"></i> 결과 PDF 다운로드
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function openTab(evt, name) {
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(name).style.display = 'block';
+            evt.currentTarget.classList.add('active');
+        }
+        document.querySelectorAll('.md-content').forEach(el => el.innerHTML = marked.parse(el.textContent));
+
+        new Chart(document.getElementById('ohaengChart'), {
+            type: 'radar',
+            data: {
+                labels: ['목', '화', '토', '금', '수'],
+                datasets: [{
+                    label: '오행점수',
+                    data: [{{ ohaeng.wood }}, {{ ohaeng.fire }}, {{ ohaeng.earth }}, {{ ohaeng.metal }}, {{ ohaeng.water }}],
+                    backgroundColor: 'rgba(167, 139, 250, 0.4)', borderColor: '#a78bfa', pointBackgroundColor: '#fff'
+                }]
+            },
+            options: { 
+                animation: false, 
+                scales: { r: { suggestedMin: 0, suggestedMax: 5, ticks: { display: false } } } 
+            }
+        });
+
+        function downloadPDF() {
+            const actionButtons = document.getElementById('action-buttons');
+            const tabsNav = document.querySelector('.tabs');
+            actionButtons.style.display = 'none';
+            tabsNav.style.display = 'none';
+
+            // 모든 탭 컨텐츠 보이기
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(c => {
+                c.style.display = 'block';
+                c.style.animation = 'none'; 
+            });
+
+            // 페이지 중간 잘림 방지를 위해 수동으로 브레이크 요소 삽입
+            const cards = document.querySelectorAll('.glass-card, .timeline-item, .dw-grid');
+            cards.forEach((card, index) => {
+                if (index > 0 && index % 2 === 0) { 
+                    const pageBreak = document.createElement('div');
+                    pageBreak.className = 'html2pdf__page-break';
+                    card.parentNode.insertBefore(pageBreak, card);
+                }
+            });
+
+            const element = document.querySelector('.container');
+            
+            // 상태 저장
+            const originalBg = element.style.background;
+            const originalMargin = element.style.margin;
+            const originalPosition = element.style.position;
+            const originalLeft = element.style.left;
+            const originalTop = element.style.top;
+            
+            // 캡처 중 이미지 무한 대기를 막기 위한 단색 배경
+            element.style.background = '#0b0914';
+            
+            // 캡처 오류(오른쪽/왼쪽 잘림)를 완벽히 막기 위해 원래 너비를 유지하면서 화면 좌측 상단(0,0)으로 임시 고정!
+            element.style.margin = '0';
+            element.style.position = 'absolute';
+            element.style.left = '0';
+            element.style.top = '0';
+            
+            window.scrollTo(0, 0);
+            
+            const opt = {
+                margin:       10, // 전체 여백 10mm
+                filename:     '{{ name }}_연서무당_사주결과.pdf',
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true,
+                    scrollX: 0,
+                    scrollY: 0
+                }, 
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: 'css' } // 삽입된 html2pdf__page-break 에서만 정확히 페이지 분리
+            };
+
+            const restoreUI = () => {
+                element.style.background = originalBg;
+                element.style.margin = originalMargin;
+                element.style.position = originalPosition;
+                element.style.left = originalLeft;
+                element.style.top = originalTop;
+                
+                actionButtons.style.display = 'flex';
+                tabsNav.style.display = 'flex';
+                
+                // 삽입한 페이지 분리 요소 제거
+                document.querySelectorAll('.html2pdf__page-break').forEach(el => el.remove());
+
+                tabContents.forEach(c => {
+                    c.style.display = 'none';
+                    c.style.animation = ''; 
+                });
+                document.getElementById('basic').style.display = 'block';
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            };
+
+            // PDF 직접 저장 트리거
+            html2pdf().set(opt).from(element).save().then(() => {
+                restoreUI();
+            }).catch(err => {
+                console.error(err);
+                alert('PDF 생성 중 문제가 발생했습니다. 브라우저 콘솔을 확인해주세요.');
+                restoreUI();
+            });
+        }
+    </script>
+</body>
+</html>

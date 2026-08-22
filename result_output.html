@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테스트님의 사주 분석 결과</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header style="text-align: center; margin-bottom: 3rem;">
+            <h2 class="text-gradient">별하 (Byeolha)</h2>
+            <h1 style="font-size: 2.5rem; margin-top: 0.5rem;">테스트님의 심층 분석 결과</h1>
+            <p style="color: var(--text-muted);">🌲 **병기운의 소유자**</p>
+        </header>
+
+        <!-- 사주 원국표 -->
+        <div class="glass-card">
+            <h3 style="margin-bottom: 1.5rem;"><i class="fa-solid fa-table-cells-large"></i> 사주 원국표</h3>
+            <div style="overflow-x: auto;">
+                <table class="saju-table">
+                    <thead>
+                        <tr>
+                            <th style="width:10%">구분</th>
+                            <th style="width:22.5%">시주 (Hour)</th>
+                            <th style="width:22.5%">일주 (Day)</th>
+                            <th style="width:22.5%">월주 (Month)</th>
+                            <th style="width:22.5%">년주 (Year)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="label-cell">천간</td>
+                            <td class="wood"><span class="hanja">갑</span><div class="ten-god">비견</div></td>
+                            <td class="fire me-cell"><span class="hanja">병</span><div class="ten-god">나</div></td>
+                            <td class="fire"><span class="hanja">정</span><div class="ten-god">비견</div></td>
+                            <td class="earth"><span class="hanja">기</span><div class="ten-god">비견</div></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">지지</td>
+                            <td class="fire"><span class="hanja">오</span><div class="ten-god">재성</div></td>
+                            <td class="wood"><span class="hanja">인</span><div class="ten-god">재성</div></td>
+                            <td class="earth"><span class="hanja">축</span><div class="ten-god">재성</div></td>
+                            <td class="fire"><span class="hanja">사</span><div class="ten-god">재성</div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 탭 네비게이션 -->
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'basic')">기본 해석</button>
+            <button class="tab-btn" onclick="openTab(event, 'ohaeng')">오행 & 십성</button>
+            <button class="tab-btn" onclick="openTab(event, 'gmhs')">인생의 흐름</button>
+            <button class="tab-btn" onclick="openTab(event, 'daewoon')">대운 (10년)</button>
+        </nav>
+
+        <!-- 탭 컨텐츠 1: 기본 해석 -->
+        <div id="basic" class="tab-content active">
+            <div class="glass-card" style="border-left: 6px solid var(--primary);">
+                <h3><i class="fa-solid fa-crown"></i> 평생사주 총평</h3>
+                <div class="md-content">**테스트**님의 사주는 병의 기운을 바탕으로 형성되어 있습니다.</div>
+            </div>
+            <div class="glass-card">
+                <h3><i class="fa-solid fa-star"></i> 오늘의 운세</h3>
+                <p><strong>2026-08-22 (갑자일)</strong></p>
+                <div class="md-content">오늘 하루는 긍정적인 에너지가 가득합니다.</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="glass-card"><h3><i class="fa-solid fa-fingerprint"></i> 심층 성향</h3><div class="md-content">심층적인 성향 분석 결과입니다.</div></div>
+                <div class="glass-card"><h3><i class="fa-solid fa-briefcase"></i> 사회적 적성</h3><div class="md-content">사회적 적성 및 직업운 분석입니다.</div></div>
+            </div>
+        </div>
+
+        <!-- 탭 컨텐츠 2: 오행 -->
+        <div id="ohaeng" class="tab-content">
+            <div class="glass-card">
+                <h3>오행 균형</h3>
+                <canvas id="ohaengChart" style="max-height: 300px;"></canvas>
+            </div>
+            <div class="glass-card">
+                <h3>밸런스 분석</h3>
+                <div class="md-content">특정 기운의 쏠림이 보입니다.</div>
+                <hr style="margin: 1rem 0; border: 0; border-top: 1px solid rgba(0,0,0,0.1);">
+                <div class="md-content">일상의 행운을 부르는 핵심 조언입니다.</div>
+            </div>
+        </div>
+
+        <!-- 탭 컨텐츠 3: 인생의 흐름 -->
+        <div id="gmhs" class="tab-content">
+            <div class="timeline">
+                
+                <div class="timeline-item">
+                    <div class="glass-card">
+                        <h3>초년기 <small>(기사)</small></h3>
+                        <p>초년기의 운세입니다.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="glass-card">
+                        <h3>청년기 <small>(정축)</small></h3>
+                        <p>청년기의 운세입니다.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="glass-card">
+                        <h3>중년기 <small>(병인)</small></h3>
+                        <p>중년기의 운세입니다.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="glass-card">
+                        <h3>말년기 <small>(갑오)</small></h3>
+                        <p>말년기의 운세입니다.</p>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- 탭 컨텐츠 4: 대운 -->
+        <div id="daewoon" class="tab-content">
+            <div class="glass-card"><h3>대운의 흐름</h3><div class="md-content">현재 대운의 흐름에 대한 설명입니다.</div></div>
+            <div class="dw-grid">
+                
+                <div class="dw-card">
+                    <div style="color:var(--primary); font-weight:800;">5세~</div>
+                    <div class="dw-pillar"><span class="wood">?</span><span class="wood">?</span></div>
+                    <p style="font-size:0.8rem;">[비견] 1번째 대운의 흐름입니다.</p>
+                </div>
+                
+                <div class="dw-card">
+                    <div style="color:var(--primary); font-weight:800;">15세~</div>
+                    <div class="dw-pillar"><span class="wood">?</span><span class="wood">?</span></div>
+                    <p style="font-size:0.8rem;">[비견] 2번째 대운의 흐름입니다.</p>
+                </div>
+                
+                <div class="dw-card">
+                    <div style="color:var(--primary); font-weight:800;">25세~</div>
+                    <div class="dw-pillar"><span class="wood">?</span><span class="wood">?</span></div>
+                    <p style="font-size:0.8rem;">[비견] 3번째 대운의 흐름입니다.</p>
+                </div>
+                
+                <div class="dw-card">
+                    <div style="color:var(--primary); font-weight:800;">35세~</div>
+                    <div class="dw-pillar"><span class="wood">?</span><span class="wood">?</span></div>
+                    <p style="font-size:0.8rem;">[비견] 4번째 대운의 흐름입니다.</p>
+                </div>
+                
+                <div class="dw-card">
+                    <div style="color:var(--primary); font-weight:800;">45세~</div>
+                    <div class="dw-pillar"><span class="wood">?</span><span class="wood">?</span></div>
+                    <p style="font-size:0.8rem;">[비견] 5번째 대운의 흐름입니다.</p>
+                </div>
+                
+                <div class="dw-card">
+                    <div style="color:var(--primary); font-weight:800;">55세~</div>
+                    <div class="dw-pillar"><span class="wood">?</span><span class="wood">?</span></div>
+                    <p style="font-size:0.8rem;">[비견] 6번째 대운의 흐름입니다.</p>
+                </div>
+                
+                <div class="dw-card">
+                    <div style="color:var(--primary); font-weight:800;">65세~</div>
+                    <div class="dw-pillar"><span class="wood">?</span><span class="wood">?</span></div>
+                    <p style="font-size:0.8rem;">[비견] 7번째 대운의 흐름입니다.</p>
+                </div>
+                
+                <div class="dw-card">
+                    <div style="color:var(--primary); font-weight:800;">75세~</div>
+                    <div class="dw-pillar"><span class="wood">?</span><span class="wood">?</span></div>
+                    <p style="font-size:0.8rem;">[비견] 8번째 대운의 흐름입니다.</p>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, name) {
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(name).style.display = 'block';
+            evt.currentTarget.classList.add('active');
+        }
+        document.querySelectorAll('.md-content').forEach(el => el.innerHTML = marked.parse(el.textContent));
+
+        new Chart(document.getElementById('ohaengChart'), {
+            type: 'radar',
+            data: {
+                labels: ['목', '화', '토', '금', '수'],
+                datasets: [{
+                    label: '오행점수',
+                    data: [2, 4, 2, 0, 0],
+                    backgroundColor: 'rgba(167, 139, 250, 0.4)', borderColor: '#a78bfa', pointBackgroundColor: '#fff'
+                }]
+            },
+            options: { scales: { r: { suggestedMin: 0, suggestedMax: 5, ticks: { display: false } } } }
+        });
+    </script>
+</body>
+</html>
