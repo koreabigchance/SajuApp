@@ -13,8 +13,77 @@
             location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.href);
         }
     </script>
+    <style>
+        /* Intro Overlay */
+        #intro-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+        #intro-video {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; display: none;
+        }
+        #intro-btn {
+            position: relative; z-index: 10000; padding: 15px 40px;
+            font-size: 1.2rem; font-weight: bold; color: #fceeb5;
+            background: rgba(30, 20, 50, 0.8); border: 2px solid #c29d59;
+            border-radius: 30px; cursor: pointer;
+            box-shadow: 0 0 20px rgba(194, 157, 89, 0.5);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(194, 157, 89, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 35px rgba(194, 157, 89, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(194, 157, 89, 0.5); }
+        }
+    </style>
 </head>
 <body>
+    <!-- Intro Overlay -->
+    <div id="intro-overlay">
+        <video id="intro-video" playsinline preload="auto">
+            <source src="{{ url_for('static', filename='intro.mp4') }}" type="video/mp4">
+        </video>
+        <button id="intro-btn">터치하여 입장하기</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.getElementById('intro-overlay');
+            const video = document.getElementById('intro-video');
+            const btn = document.getElementById('intro-btn');
+            
+            // 이미 영상을 봤는지 세션 체크 (새로고침 시 매번 나오는 것 방지)
+            if (sessionStorage.getItem('introWatched')) {
+                overlay.style.display = 'none';
+                return;
+            }
+            
+            btn.addEventListener('click', () => {
+                btn.style.display = 'none';
+                video.style.display = 'block';
+                // 볼륨을 켜서 재생 (모바일 정책 허용 - 사용자 클릭에 의한 재생)
+                video.muted = false;
+                video.play().catch(e => {
+                    console.error("비디오 재생 실패", e);
+                    skipIntro(); // 재생 실패 시 강제 스킵하여 메인 화면으로 이동
+                });
+            });
+            
+            video.addEventListener('ended', skipIntro);
+            video.addEventListener('click', skipIntro); // 영상 재생 중 터치 시 스킵
+            
+            function skipIntro() {
+                sessionStorage.setItem('introWatched', 'true');
+                overlay.style.opacity = '0';
+                overlay.style.visibility = 'hidden';
+                setTimeout(() => overlay.remove(), 1000); // 1초 뒤 완전히 DOM에서 제거
+            }
+        });
+    </script>
+
     <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
         <div class="glass-card fade-in" style="width: 100%; max-width: 480px; position: relative; overflow: hidden;">
             
