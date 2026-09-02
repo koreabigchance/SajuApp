@@ -242,21 +242,55 @@
             // PDF 생성 (차트 렌더링을 위해 아주 짧은 딜레이 추가)
             setTimeout(() => {
                 html2pdf().set(opt).from(element).outputPdf('blob').then(function (pdfBlob) {
+                    const fileName = '{{ name }}_연서무당_사주결과.pdf';
                     const blobUrl = URL.createObjectURL(pdfBlob);
+                    const isKakao = navigator.userAgent.toLowerCase().includes('kakaotalk');
                     
+                    let shareButtonHtml = '';
+                    // 최신 모바일 브라우저의 '공유/저장' 네이티브 기능 지원 여부 확인
+                    const canShare = navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], fileName, {type: 'application/pdf'})] });
+                    
+                    if (canShare) {
+                        shareButtonHtml = `<button id="share-btn" style="display:inline-block; margin-top: 20px; padding: 15px 30px; background: linear-gradient(135deg, #c29d59, #9e7b3f); border: none; color: #fff; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">📤 PDF 폰에 저장 / 공유하기</button>`;
+                    } else {
+                        shareButtonHtml = `<a href="${blobUrl}" download="${fileName}" style="display:inline-block; margin-top: 20px; padding: 15px 30px; background: linear-gradient(135deg, #c29d59, #9e7b3f); color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">⬇️ PDF 다운로드</a>`;
+                    }
+                    
+                    const kakaoWarning = isKakao ? `<p style="color: #fca5a5; font-size: 0.95rem; line-height: 1.5; margin-top: 20px; background: rgba(255,0,0,0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,0,0,0.2);">⚠️ <strong>카카오톡 내부 브라우저</strong>는 자체 보안으로 파일 다운로드를 막습니다.<br><br>위 버튼이 작동안하면, 화면 우측 하단(또는 상단)의 <strong>[⋮] 메뉴 버튼</strong>을 눌러 <strong>'다른 브라우저(Safari/Chrome)로 열기'</strong>를 선택한 뒤 다시 다운로드해 주세요.</p>` : '';
+
                     document.getElementById('pdf-loading').innerHTML = `
-                        <p style="color: #86efac;">✅ PDF 생성이 완료되었습니다!</p>
-                        <a href="${blobUrl}" download="{{ name }}_연서무당_사주결과.pdf" style="display:inline-block; margin-top: 20px; padding: 15px 30px; background: linear-gradient(135deg, #c29d59, #9e7b3f); color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">PDF 다운로드 (저장)</a>
+                        <p style="color: #86efac; font-size: 1.2rem;">✅ PDF 생성이 완료되었습니다!</p>
+                        ${shareButtonHtml}
+                        ${kakaoWarning}
                         <p style="font-size: 0.9rem; color: #94a3b8; margin-top: 25px;"><a href="javascript:history.back()" style="color: #94a3b8; text-decoration: none; border-bottom: 1px solid #94a3b8; padding-bottom: 2px;">이전 화면으로 돌아가기</a></p>
                     `;
                     
-                    // 자동 다운로드 시도
-                    const tempLink = document.createElement('a');
-                    tempLink.href = blobUrl;
-                    tempLink.download = '{{ name }}_연서무당_사주결과.pdf';
-                    document.body.appendChild(tempLink);
-                    tempLink.click();
-                    document.body.removeChild(tempLink);
+                    const shareBtn = document.getElementById('share-btn');
+                    if (shareBtn) {
+                        shareBtn.onclick = async () => {
+                            try {
+                                const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+                                await navigator.share({
+                                    title: '연서무당 사주 분석 결과',
+                                    files: [file]
+                                });
+                            } catch (err) {
+                                console.log("공유 실패 또는 취소", err);
+                                // 실패시 수동 다운로드 링크 표시
+                                if (!document.getElementById('fallback-link')) {
+                                    document.getElementById('pdf-loading').innerHTML += `<p id="fallback-link" style="margin-top: 20px;"><a href="${blobUrl}" download="${fileName}" style="color: #fceeb5; text-decoration: underline; padding: 10px; border: 1px solid rgba(252, 238, 181, 0.3); border-radius: 6px;">혹시 저장이 안 되셨나요? 강제 다운로드 시도하기</a></p>`;
+                                }
+                            }
+                        };
+                    } else if (!isKakao) {
+                        // 카카오톡이 아니고 PC 환경 등일 때만 자동 다운로드 시도
+                        const tempLink = document.createElement('a');
+                        tempLink.href = blobUrl;
+                        tempLink.download = fileName;
+                        document.body.appendChild(tempLink);
+                        tempLink.click();
+                        document.body.removeChild(tempLink);
+                    }
                     
                 }).catch(err => {
                     console.error(err);
