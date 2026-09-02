@@ -124,15 +124,21 @@
             </div>
         </div>
         
+        <form id="pdf-form" action="/pdf_view" method="POST" target="_blank" style="display: none;">
+            <input type="hidden" name="name" value="{{ name }}">
+            <input type="hidden" name="pillars" value="{{ pillars | tojson | forceescape }}">
+            <input type="hidden" name="ohaeng" value="{{ ohaeng | tojson | forceescape }}">
+            <input type="hidden" name="interp" value="{{ interp | tojson | forceescape }}">
+        </form>
+
         <div style="text-align: center; margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;" id="action-buttons">
             <a href="/" class="btn-primary" style="display: inline-block; text-decoration: none; max-width: 200px; text-align: center; padding: 1.2rem;">다시 입력하기</a>
-            <button onclick="downloadPDF()" class="btn-primary" style="display: inline-block; max-width: 250px; background: linear-gradient(135deg, rgba(194, 157, 89, 0.8) 0%, rgba(158, 123, 63, 0.8) 100%); border-color: #fceeb5; color: #fff;">
+            <button onclick="document.getElementById('pdf-form').submit()" class="btn-primary" style="display: inline-block; max-width: 250px; background: linear-gradient(135deg, rgba(194, 157, 89, 0.8) 0%, rgba(158, 123, 63, 0.8) 100%); border-color: #fceeb5; color: #fff;">
                 <i class="fa-solid fa-file-pdf"></i> 결과 PDF 다운로드
             </button>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         function openTab(evt, name) {
             document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
@@ -157,95 +163,6 @@
                 scales: { r: { suggestedMin: 0, suggestedMax: 5, ticks: { display: false } } } 
             }
         });
-
-        function downloadPDF() {
-            const actionButtons = document.getElementById('action-buttons');
-            const tabsNav = document.querySelector('.tabs');
-            actionButtons.style.display = 'none';
-            tabsNav.style.display = 'none';
-
-            // 모든 탭 컨텐츠 보이기
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(c => {
-                c.style.display = 'block';
-                c.style.animation = 'none'; 
-            });
-
-            // 페이지 중간 잘림 방지를 위해 수동으로 브레이크 요소 삽입
-            const cards = document.querySelectorAll('.glass-card, .timeline-item, .dw-grid');
-            cards.forEach((card, index) => {
-                if (index > 0 && index % 2 === 0) { 
-                    const pageBreak = document.createElement('div');
-                    pageBreak.className = 'html2pdf__page-break';
-                    card.parentNode.insertBefore(pageBreak, card);
-                }
-            });
-
-            const element = document.querySelector('.container');
-            
-            // 상태 저장
-            const originalBg = element.style.background;
-            const originalMargin = element.style.margin;
-            const originalPosition = element.style.position;
-            const originalLeft = element.style.left;
-            const originalTop = element.style.top;
-            
-            // 캡처 중 이미지 무한 대기를 막기 위한 단색 배경
-            element.style.background = '#0b0914';
-            
-            // 캡처 오류(오른쪽/왼쪽 잘림)를 완벽히 막기 위해 원래 너비를 유지하면서 화면 좌측 상단(0,0)으로 임시 고정!
-            element.style.margin = '0';
-            element.style.position = 'absolute';
-            element.style.left = '0';
-            element.style.top = '0';
-            
-            window.scrollTo(0, 0);
-            
-            const opt = {
-                margin:       10, // 전체 여백 10mm
-                filename:     '{{ name }}_연서무당_사주결과.pdf',
-                image:        { type: 'jpeg', quality: 1.0 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true,
-                    scrollX: 0,
-                    scrollY: 0
-                }, 
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: 'css' } // 삽입된 html2pdf__page-break 에서만 정확히 페이지 분리
-            };
-
-            const restoreUI = () => {
-                element.style.background = originalBg;
-                element.style.margin = originalMargin;
-                element.style.position = originalPosition;
-                element.style.left = originalLeft;
-                element.style.top = originalTop;
-                
-                actionButtons.style.display = 'flex';
-                tabsNav.style.display = 'flex';
-                
-                // 삽입한 페이지 분리 요소 제거
-                document.querySelectorAll('.html2pdf__page-break').forEach(el => el.remove());
-
-                tabContents.forEach(c => {
-                    c.style.display = 'none';
-                    c.style.animation = ''; 
-                });
-                document.getElementById('basic').style.display = 'block';
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-            };
-
-            // PDF 직접 저장 트리거
-            html2pdf().set(opt).from(element).save().then(() => {
-                restoreUI();
-            }).catch(err => {
-                console.error(err);
-                alert('PDF 생성 중 문제가 발생했습니다. 브라우저 콘솔을 확인해주세요.');
-                restoreUI();
-            });
-        }
     </script>
 </body>
 </html>

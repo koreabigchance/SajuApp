@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ name }}님 사주 분석 결과 (PDF)</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @page { size: A4 portrait; margin: 0; }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0b0914;
+            color: #e2e8f0;
+            font-family: 'Pretendard', sans-serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .a4-container {
+            width: 210mm; /* A4 가로폭 */
+            padding: 15mm;
+            box-sizing: border-box;
+            background-color: #0b0914;
+            margin: 0 auto;
+        }
+        h1, h2, h3 { margin-top: 0; }
+        .text-gradient {
+            background: linear-gradient(135deg, #fceeb5 0%, #e0c38c 50%, #c29d59 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-card {
+            background: rgba(30, 20, 50, 0.6);
+            border: 1px solid rgba(194, 157, 89, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            page-break-inside: avoid; /* 카드 중간 잘림 방지 */
+            break-inside: avoid;
+        }
+        .saju-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: rgba(10, 5, 20, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+        .saju-table th, .saju-table td {
+            border: 1px solid rgba(194, 157, 89, 0.2);
+            padding: 12px 8px;
+            text-align: center;
+        }
+        .saju-table th { background: rgba(194, 157, 89, 0.1); color: #fceeb5; font-weight: 600; }
+        .hanja { font-size: 1.8rem; font-weight: 800; display: block; margin-bottom: 4px; }
+        .ten-god { font-size: 0.85rem; color: #94a3b8; }
+        
+        /* 오행 색상 */
+        .wood { color: #86efac; }
+        .fire { color: #fca5a5; }
+        .earth { color: #fde047; }
+        .metal { color: #d1d5db; }
+        .water { color: #93c5fd; }
+        
+        .md-content { line-height: 1.7; font-size: 14px; }
+        .md-content strong { color: #fceeb5; font-weight: 700; }
+        
+        /* 로딩 오버레이 */
+        #pdf-loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 9, 20, 0.95); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #fceeb5; font-size: 1.5rem; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="pdf-loading">
+        <p>PDF 문서를 굽는 중입니다...</p>
+        <p style="font-size: 1rem; color: #94a3b8; margin-top: 10px;">잠시만 기다려주세요. (다운로드 완료 후 창을 닫으셔도 됩니다)</p>
+    </div>
+
+    <div class="a4-container" id="pdf-content">
+        <!-- 헤더 영역 -->
+        <header style="text-align: center; margin-bottom: 40px; margin-top: 20px;">
+            <h2 class="text-gradient" style="margin-bottom: 10px;">연서무당 (Yeonseo Mudang)</h2>
+            <h1 style="font-size: 2.2rem; color: #fff;">
+                <span style="color: #fceeb5;">{{ name }}</span>님의 심층 분석 결과
+            </h1>
+        </header>
+
+        <!-- 1. 사주 원국표 -->
+        <div class="glass-card">
+            <h3 style="color: #fceeb5;">사주 원국표</h3>
+            <table class="saju-table">
+                <thead>
+                    <tr>
+                        <th style="width:10%">구분</th>
+                        <th style="width:22.5%">시주</th>
+                        <th style="width:22.5%">일주</th>
+                        <th style="width:22.5%">월주</th>
+                        <th style="width:22.5%">년주</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color: #94a3b8;">천간</td>
+                        <td class="{{ pillars.hour.gan_element }}"><span class="hanja">{{ pillars.hour.gan }}</span><div class="ten-god">{{ interp.ten_gods.hour.gan }}</div></td>
+                        <td class="{{ pillars.day.gan_element }}" style="background: rgba(194, 157, 89, 0.1);"><span class="hanja">{{ pillars.day.gan }}</span><div class="ten-god">나</div></td>
+                        <td class="{{ pillars.month.gan_element }}"><span class="hanja">{{ pillars.month.gan }}</span><div class="ten-god">{{ interp.ten_gods.month.gan }}</div></td>
+                        <td class="{{ pillars.year.gan_element }}"><span class="hanja">{{ pillars.year.gan }}</span><div class="ten-god">{{ interp.ten_gods.year.gan }}</div></td>
+                    </tr>
+                    <tr>
+                        <td style="color: #94a3b8;">지지</td>
+                        <td class="{{ pillars.hour.zhi_element }}"><span class="hanja">{{ pillars.hour.zhi }}</span><div class="ten-god">{{ interp.ten_gods.hour.zhi }}</div></td>
+                        <td class="{{ pillars.day.zhi_element }}"><span class="hanja">{{ pillars.day.zhi }}</span><div class="ten-god">{{ interp.ten_gods.day.zhi }}</div></td>
+                        <td class="{{ pillars.month.zhi_element }}"><span class="hanja">{{ pillars.month.zhi }}</span><div class="ten-god">{{ interp.ten_gods.month.zhi }}</div></td>
+                        <td class="{{ pillars.year.zhi_element }}"><span class="hanja">{{ pillars.year.zhi }}</span><div class="ten-god">{{ interp.ten_gods.year.zhi }}</div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 2. 평생사주 총평 -->
+        <div class="glass-card">
+            <h3 style="color: #fceeb5;">평생사주 총평</h3>
+            <div class="md-content">{{ interp.total_summary }}</div>
+        </div>
+
+        <!-- 3. 핵심 분석들 -->
+        <div class="glass-card">
+            <h3 style="color: #fceeb5;">심층 성향</h3>
+            <div class="md-content">{{ interp.personality_deep }}</div>
+        </div>
+        <div class="glass-card">
+            <h3 style="color: #fceeb5;">사회적 적성</h3>
+            <div class="md-content">{{ interp.social_analysis }}</div>
+        </div>
+        <div class="glass-card">
+            <h3 style="color: #fceeb5;">애정운</h3>
+            <div class="md-content">{{ interp.love_romance }}</div>
+        </div>
+        <div class="glass-card">
+            <h3 style="color: #fceeb5;">재물운 전략</h3>
+            <div class="md-content">{{ interp.wealth_strategy }}</div>
+        </div>
+
+        <!-- 4. 인생의 흐름 (근묘화실) -->
+        <h2 style="color: #fceeb5; margin-top: 30px; margin-bottom: 15px; border-bottom: 1px solid rgba(194, 157, 89, 0.3); padding-bottom: 10px;">인생의 흐름 (시기별 운세)</h2>
+        {% for p in ['year', 'month', 'day', 'hour'] %}
+        <div class="glass-card">
+            <h3 style="color: #fff; margin-bottom: 10px;">{{ interp.gmhs[p].period }} ({{ interp.gmhs[p].pillar.gan }}{{ interp.gmhs[p].pillar.zhi }})</h3>
+            <div class="md-content">{{ interp.gmhs[p].desc }}</div>
+        </div>
+        {% endfor %}
+
+        <!-- 5. 대운 분석 -->
+        <h2 style="color: #fceeb5; margin-top: 30px; margin-bottom: 15px; border-bottom: 1px solid rgba(194, 157, 89, 0.3); padding-bottom: 10px;">대운의 흐름 (10년 주기)</h2>
+        <div class="glass-card">
+            <div class="md-content">{{ interp.daewoon_trend }}</div>
+        </div>
+        
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; page-break-inside: avoid;">
+            {% for dw in interp.daewoon %}
+            <div style="flex: 1 1 calc(50% - 10px); background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; box-sizing: border-box;">
+                <div style="color: #fceeb5; font-weight: bold; margin-bottom: 5px;">{{ dw.age }}세~</div>
+                <div style="font-size: 1.2rem; font-weight: 800;">
+                    <span class="{{ dw.gan_element }}">{{ dw.gan }}</span><span class="{{ dw.zhi_element }}">{{ dw.zhi }}</span>
+                </div>
+                <div style="font-size: 0.85rem; color: #cbd5e1; margin-top: 5px;">{{ dw.text }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; font-size: 0.9rem; color: #64748b; page-break-inside: avoid;">
+            <p>본 사주 분석 결과는 2030 맞춤형 연서무당 AI가 생성한 결과입니다.</p>
+        </div>
+    </div>
+
+    <script>
+        // 마크다운 변환
+        document.querySelectorAll('.md-content').forEach(el => {
+            el.innerHTML = marked.parse(el.textContent);
+        });
+
+        // 페이지 로드 완료 시 자동으로 PDF 생성 시작
+        window.onload = function() {
+            const element = document.getElementById('pdf-content');
+            
+            const opt = {
+                margin:       [10, 0, 10, 0], // 위, 오, 아래, 왼 여백 (mm)
+                filename:     '{{ name }}_연서무당_사주결과.pdf',
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true,
+                    letterRendering: true
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['css', 'legacy'] } // avoid 속성을 인식하여 자동으로 페이지를 넘김
+            };
+
+            // PDF 생성
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.getElementById('pdf-loading').innerHTML = `
+                    <p style="color: #86efac;">✅ PDF 다운로드가 완료되었습니다!</p>
+                    <p style="font-size: 1rem; color: #94a3b8; margin-top: 15px;">이 창을 닫아주세요.</p>
+                `;
+            }).catch(err => {
+                console.error(err);
+                document.getElementById('pdf-loading').innerHTML = `
+                    <p style="color: #fca5a5;">❌ PDF 생성 중 오류가 발생했습니다.</p>
+                    <p style="font-size: 1rem; color: #94a3b8; margin-top: 15px;">브라우저 콘솔을 확인해주세요.</p>
+                `;
+            });
+        };
+    </script>
+</body>
+</html>

@@ -88,5 +88,28 @@ def result():
         traceback.print_exc()
         return f"Error occurred: {str(e)}", 400
 
+@app.route('/pdf_view', methods=['POST'])
+def pdf_view():
+    import json
+    try:
+        name = request.form.get('name')
+        pillars_json = request.form.get('pillars')
+        ohaeng_json = request.form.get('ohaeng')
+        interp_json = request.form.get('interp')
+        
+        pillars = json.loads(pillars_json) if pillars_json else {}
+        ohaeng = json.loads(ohaeng_json) if ohaeng_json else {}
+        interp = json.loads(interp_json) if interp_json else {}
+        
+        return render_template('pdf_view.html', 
+                               name=name, 
+                               pillars=pillars, 
+                               ohaeng=ohaeng, 
+                               interp=interp)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return f"Error occurred in PDF generation: {str(e)}", 400
+
 if __name__ == '__main__':
     app.run(debug=True, port=5005)
