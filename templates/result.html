@@ -9,6 +9,18 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* 모바일에서는 1열 */
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .analysis-grid {
+                grid-template-columns: 1fr 1fr; /* PC에서는 2열 */
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -74,7 +86,7 @@
                 <p><strong>{{ interp.today_luck.date }} ({{ interp.today_luck.pillar }})</strong></p>
                 <div class="md-content">{{ interp.today_luck.desc }}</div>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="analysis-grid">
                 <div class="glass-card"><h3><i class="fa-solid fa-fingerprint"></i> 심층 성향</h3><div class="md-content">{{ interp.personality_deep }}</div></div>
                 <div class="glass-card"><h3><i class="fa-solid fa-briefcase"></i> 사회적 적성</h3><div class="md-content">{{ interp.social_analysis }}</div></div>
                 <div class="glass-card"><h3><i class="fa-solid fa-heart"></i> 애정운</h3><div class="md-content">{{ interp.love_romance }}</div></div>
@@ -124,7 +136,7 @@
             </div>
         </div>
         
-        <form id="pdf-form" action="/pdf_view" method="POST" target="_blank" style="display: none;">
+        <form id="pdf-form" action="/pdf_view" method="POST" style="display: none;">
             <input type="hidden" name="name" value="{{ name }}">
             <input type="hidden" name="pillars" value="{{ pillars | tojson | forceescape }}">
             <input type="hidden" name="ohaeng" value="{{ ohaeng | tojson | forceescape }}">

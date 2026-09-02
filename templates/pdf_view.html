@@ -241,16 +241,29 @@
 
             // PDF 생성 (차트 렌더링을 위해 아주 짧은 딜레이 추가)
             setTimeout(() => {
-                html2pdf().set(opt).from(element).save().then(() => {
+                html2pdf().set(opt).from(element).outputPdf('blob').then(function (pdfBlob) {
+                    const blobUrl = URL.createObjectURL(pdfBlob);
+                    
                     document.getElementById('pdf-loading').innerHTML = `
-                        <p style="color: #86efac;">✅ PDF 다운로드가 완료되었습니다!</p>
-                        <p style="font-size: 1rem; color: #94a3b8; margin-top: 15px;">이 창을 닫아주세요.</p>
+                        <p style="color: #86efac;">✅ PDF 생성이 완료되었습니다!</p>
+                        <a href="${blobUrl}" download="{{ name }}_연서무당_사주결과.pdf" style="display:inline-block; margin-top: 20px; padding: 15px 30px; background: linear-gradient(135deg, #c29d59, #9e7b3f); color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">PDF 다운로드 (저장)</a>
+                        <p style="font-size: 0.9rem; color: #94a3b8; margin-top: 25px;"><a href="javascript:history.back()" style="color: #94a3b8; text-decoration: none; border-bottom: 1px solid #94a3b8; padding-bottom: 2px;">이전 화면으로 돌아가기</a></p>
                     `;
+                    
+                    // 자동 다운로드 시도
+                    const tempLink = document.createElement('a');
+                    tempLink.href = blobUrl;
+                    tempLink.download = '{{ name }}_연서무당_사주결과.pdf';
+                    document.body.appendChild(tempLink);
+                    tempLink.click();
+                    document.body.removeChild(tempLink);
+                    
                 }).catch(err => {
                     console.error(err);
                     document.getElementById('pdf-loading').innerHTML = `
                         <p style="color: #fca5a5;">❌ PDF 생성 중 오류가 발생했습니다.</p>
                         <p style="font-size: 1rem; color: #94a3b8; margin-top: 15px;">브라우저 콘솔을 확인해주세요.</p>
+                        <p style="font-size: 0.9rem; color: #94a3b8; margin-top: 25px;"><a href="javascript:history.back()" style="color: #94a3b8; text-decoration: none; border-bottom: 1px solid #94a3b8; padding-bottom: 2px;">이전 화면으로 돌아가기</a></p>
                     `;
                 });
             }, 300); // 차트 렌더링 완료 대기
