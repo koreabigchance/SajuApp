@@ -26,6 +26,7 @@ def result():
     gender = request.form.get('gender')
     birth_date_str = request.form.get('birth_date')
     birth_time_str = request.form.get('birth_time')
+    unknown_time = request.form.get('unknown_time') == 'true'
     
     try:
         year, month, day = map(int, birth_date_str.split('-'))
@@ -38,6 +39,8 @@ def result():
         now = datetime.now()
         age = now.year - year + 1
         birth_context = f"{year}년생 ({age}세)"
+        if unknown_time:
+            birth_context += " (태어난 시간 모름 - 시주 정보는 무시하고 삼주 위주로 풀이할 것)"
         
         ten_gods_all = []
         for p_key in interpretations['ten_gods']:

@@ -25,7 +25,10 @@
                     <i class="fa-solid fa-star" style="font-size: 0.6rem; color: #fceeb5; position: absolute; top: 15px; right: 15px;"></i>
                 </div>
                 
-                <h1 class="neon-text" style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.8rem; letter-spacing: 1px;">연서무당 <span style="font-size: 1.2rem; font-weight: 400; opacity: 0.8; text-shadow: none; color: #f0e6fa;">(Yeonseo Mudang)</span></h1>
+                <h1 class="neon-text" style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.8rem; letter-spacing: 1px; display: flex; flex-direction: column; align-items: center; gap: 0.3rem;">
+                    <span>연서무당</span>
+                    <span style="font-size: 1.2rem; font-weight: 400; opacity: 0.8; text-shadow: none; color: #f0e6fa;">(Yeonseo Mudang)</span>
+                </h1>
                 <p style="color: #1a1025; background: linear-gradient(135deg, #fceeb5 0%, #c29d59 100%); display: inline-block; padding: 0.4rem 1.2rem; border-radius: 30px; font-size: 1.1rem; font-weight: 800; letter-spacing: 1px; box-shadow: 0 0 20px rgba(194, 157, 89, 0.5); margin-bottom: 1rem;">MZ 20년차 만신</p>
             </div>
             
@@ -70,12 +73,33 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="birth_time">태어난 시간</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label for="birth_time" style="margin-bottom: 0;">태어난 시간</label>
+                        <label style="font-size: 0.85rem; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                            <input type="checkbox" id="unknown_time" name="unknown_time" value="true" onchange="toggleTimeInput()"> 태어난 시간을 모름
+                        </label>
+                    </div>
                     <div style="position: relative;">
                         <i class="fa-regular fa-clock" style="position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); z-index: 1;"></i>
-                        <input type="time" id="birth_time" name="birth_time" required style="padding-left: 3rem;">
+                        <input type="time" id="birth_time" name="birth_time" required style="padding-left: 3rem; transition: opacity 0.3s;">
                     </div>
                 </div>
+                
+                <script>
+                    function toggleTimeInput() {
+                        const timeInput = document.getElementById('birth_time');
+                        const isUnknown = document.getElementById('unknown_time').checked;
+                        if (isUnknown) {
+                            timeInput.value = "12:00"; // 기본 오시(午時)로 설정
+                            timeInput.style.opacity = "0.4";
+                            timeInput.style.pointerEvents = "none";
+                        } else {
+                            timeInput.value = "";
+                            timeInput.style.opacity = "1";
+                            timeInput.style.pointerEvents = "auto";
+                        }
+                    }
+                </script>
                 
                 <button type="submit" class="btn-primary" style="margin-top: 1.5rem;">
                     운세 확인하기
