@@ -6,6 +6,7 @@
     <title>{{ name }}님 사주 분석 결과 (PDF)</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @page { size: A4 portrait; margin: 0; }
@@ -124,8 +125,22 @@
             </table>
         </div>
 
+        <!-- 1-5. 오행 분석 -->
+        <h2 style="color: #fceeb5; margin-top: 30px; margin-bottom: 15px; border-bottom: 1px solid rgba(194, 157, 89, 0.3); padding-bottom: 10px;">오행 & 십성 밸런스</h2>
+        <div style="display: flex; gap: 20px; page-break-inside: avoid; align-items: stretch;">
+            <div class="glass-card" style="flex: 1; margin-bottom: 0;">
+                <h3 style="color: #fceeb5;">오행 균형 (차트)</h3>
+                <canvas id="pdfOhaengChart" style="max-height: 250px; width: 100%;"></canvas>
+            </div>
+            <div class="glass-card" style="flex: 1; margin-bottom: 0;">
+                <h3 style="color: #fceeb5;">밸런스 분석</h3>
+                <div class="md-content" style="margin-bottom: 15px;">{{ interp.ohaeng_analysis.balance_text }}</div>
+                <div class="md-content" style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">{{ interp.advice }}</div>
+            </div>
+        </div>
+
         <!-- 2. 평생사주 총평 -->
-        <div class="glass-card">
+        <div class="glass-card" style="margin-top: 20px;">
             <h3 style="color: #fceeb5;">평생사주 총평</h3>
             <div class="md-content">{{ interp.total_summary }}</div>
         </div>
@@ -188,6 +203,25 @@
 
         // 페이지 로드 완료 시 자동으로 PDF 생성 시작
         window.onload = function() {
+            // 오행 차트 그리기
+            new Chart(document.getElementById('pdfOhaengChart'), {
+                type: 'radar',
+                data: {
+                    labels: ['목', '화', '토', '금', '수'],
+                    datasets: [{
+                        label: '오행점수',
+                        data: [{{ ohaeng.wood }}, {{ ohaeng.fire }}, {{ ohaeng.earth }}, {{ ohaeng.metal }}, {{ ohaeng.water }}],
+                        backgroundColor: 'rgba(167, 139, 250, 0.4)', 
+                        borderColor: '#a78bfa', 
+                        pointBackgroundColor: '#fff'
+                    }]
+                },
+                options: { 
+                    animation: false, // PDF 캡처를 위해 애니메이션 비활성화 필수
+                    scales: { r: { suggestedMin: 0, suggestedMax: 5, ticks: { display: false } } } 
+                }
+            });
+
             const element = document.getElementById('pdf-content');
             
             const opt = {
@@ -203,19 +237,21 @@
                 pagebreak:    { mode: ['css', 'legacy'] } // avoid 속성을 인식하여 자동으로 페이지를 넘김
             };
 
-            // PDF 생성
-            html2pdf().set(opt).from(element).save().then(() => {
-                document.getElementById('pdf-loading').innerHTML = `
-                    <p style="color: #86efac;">✅ PDF 다운로드가 완료되었습니다!</p>
-                    <p style="font-size: 1rem; color: #94a3b8; margin-top: 15px;">이 창을 닫아주세요.</p>
-                `;
-            }).catch(err => {
-                console.error(err);
-                document.getElementById('pdf-loading').innerHTML = `
-                    <p style="color: #fca5a5;">❌ PDF 생성 중 오류가 발생했습니다.</p>
-                    <p style="font-size: 1rem; color: #94a3b8; margin-top: 15px;">브라우저 콘솔을 확인해주세요.</p>
-                `;
-            });
+            // PDF 생성 (차트 렌더링을 위해 아주 짧은 딜레이 추가)
+            setTimeout(() => {
+                html2pdf().set(opt).from(element).save().then(() => {
+                    document.getElementById('pdf-loading').innerHTML = `
+                        <p style="color: #86efac;">✅ PDF 다운로드가 완료되었습니다!</p>
+                        <p style="font-size: 1rem; color: #94a3b8; margin-top: 15px;">이 창을 닫아주세요.</p>
+                    `;
+                }).catch(err => {
+                    console.error(err);
+                    document.getElementById('pdf-loading').innerHTML = `
+                        <p style="color: #fca5a5;">❌ PDF 생성 중 오류가 발생했습니다.</p>
+                        <p style="font-size: 1rem; color: #94a3b8; margin-top: 15px;">브라우저 콘솔을 확인해주세요.</p>
+                    `;
+                });
+            }, 300); // 차트 렌더링 완료 대기
         };
     </script>
 </body>
