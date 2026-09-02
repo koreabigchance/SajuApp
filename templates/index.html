@@ -43,10 +43,8 @@
 <body>
     <!-- Intro Overlay -->
     <div id="intro-overlay">
-        <video id="intro-video" playsinline preload="auto">
-            <source src="{{ url_for('static', filename='intro.mp4') }}" type="video/mp4">
-        </video>
-        <button id="intro-btn">터치하여 입장하기</button>
+        <video id="intro-video" playsinline></video>
+        <button id="intro-btn" disabled style="opacity: 0.5; cursor: wait;">신령한 기운을 모으는 중...</button>
     </div>
 
     <script>
@@ -54,6 +52,7 @@
             const overlay = document.getElementById('intro-overlay');
             const video = document.getElementById('intro-video');
             const btn = document.getElementById('intro-btn');
+            const videoUrl = "{{ url_for('static', filename='intro.mp4') }}";
             
             // 이미 영상을 봤는지 세션 체크 (새로고침 시 매번 나오는 것 방지)
             if (sessionStorage.getItem('introWatched')) {
@@ -61,25 +60,67 @@
                 return;
             }
             
+            // 모바일 브라우저의 렉(버퍼링)을 방지하기 위해 비디오를 백그라운드에서 캐싱(Blob)
+            fetch(videoUrl)
+                .then(response => {
+                    const contentLength = response.headers.get('content-length');
+                    if (!contentLength) {
+                        btn.innerText = "로딩 중...";
+                        return response.blob();
+                    }
+                    const total = parseInt(contentLength, 10);
+                    let loaded = 0;
+                    const reader = response.body.getReader();
+                    const chunks = [];
+                    
+                    return reader.read().then(function processResult(result) {
+                        if (result.done) return new Blob(chunks, { type: 'video/mp4' });
+                        loaded += result.value.length;
+                        const percent = Math.round((loaded / total) * 100);
+                        btn.innerText = `신령한 기운을 모으는 중... ${percent}%`;
+                        chunks.push(result.value);
+                        return reader.read().then(processResult);
+                    });
+                })
+                .then(blob => {
+                    const blobUrl = URL.createObjectURL(blob);
+                    video.src = blobUrl;
+                    
+                    // 다운로드 완료 시 버튼 활성화
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    btn.innerText = "터치하여 입장하기";
+                })
+                .catch(err => {
+                    console.error("비디오 다운로드 에러:", err);
+                    // 실패 시 일반 스트리밍 방식으로 폴백
+                    video.src = videoUrl;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    btn.innerText = "터치하여 입장하기";
+                });
+            
             btn.addEventListener('click', () => {
+                if(btn.disabled) return;
                 btn.style.display = 'none';
                 video.style.display = 'block';
-                // 볼륨을 켜서 재생 (모바일 정책 허용 - 사용자 클릭에 의한 재생)
                 video.muted = false;
                 video.play().catch(e => {
                     console.error("비디오 재생 실패", e);
-                    skipIntro(); // 재생 실패 시 강제 스킵하여 메인 화면으로 이동
+                    skipIntro();
                 });
             });
             
             video.addEventListener('ended', skipIntro);
-            video.addEventListener('click', skipIntro); // 영상 재생 중 터치 시 스킵
+            video.addEventListener('click', skipIntro);
             
             function skipIntro() {
                 sessionStorage.setItem('introWatched', 'true');
                 overlay.style.opacity = '0';
                 overlay.style.visibility = 'hidden';
-                setTimeout(() => overlay.remove(), 1000); // 1초 뒤 완전히 DOM에서 제거
+                setTimeout(() => overlay.remove(), 1000);
             }
         });
     </script>
