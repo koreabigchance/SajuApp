@@ -8,6 +8,12 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        // 카카오톡 인앱 브라우저 감지 시 외부 브라우저(Safari/Chrome)로 강제 이동
+        if (navigator.userAgent.toLowerCase().indexOf('kakaotalk') > -1) {
+            location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.href);
+        }
+    </script>
     <style>
         @page { size: A4 portrait; margin: 0; }
         body {
