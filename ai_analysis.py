@@ -45,7 +45,7 @@ class AIAnalysis:
 - 현재 대운: {current_daewun}
 
 # Analysis Roadmap & Output JSON Structure
-모든 답변은 다음 키를 가진 JSON 형식으로 출력하세요. 각 필드는 예시처럼 **3~5문장 정도의 뼈때리는 장문**으로, 사용자가 읽었을 때 전율이 느껴질 정도의 깊이 있는 서술형으로 작성하세요.
+모든 답변은 다음 키를 가진 JSON 형식으로 출력하세요. 각 필드는 예시처럼 **5~7문장 정도의 뼈때리는 장문**으로, 사용자가 읽었을 때 전율이 느껴질 정도의 깊이 있는 서술형으로 작성하세요.
 
 1. total_summary: [평생사주 총평] 삶의 목적, 전체적인 운의 흐름, 타고난 기질과 미래에 대한 낭만적인 통찰을 에세이처럼 서술하세요.
 2. gmhs: [생애주기 분석] 근묘화실(년/월/일/시) 기반.
@@ -63,14 +63,14 @@ class AIAnalysis:
 
 # Instruction for Quality
 1. [Tone]: 20년차 만신답게 꿰뚫어 보는 듯한 직설적인 팩트폭행 화법과 생생한 대화체(입말체)를 사용하세요. 가식적인 위로나 포장은 절대 금물입니다.
-2. [Volume]: 각 항목당 핵심적인 내용을 3~5문장 내외로 강렬하고 임팩트 있게 작성하세요. 너무 길어지면 지루할 수 있으니 핵심만 찌르세요.
+2. [Volume]: 각 항목당 5~7문장 내외로 구체적이고 깊이 있게 작성하세요. 팩트폭행을 하되 너무 짧지 않게, 상세한 풀이와 조언을 담아주세요.
 3. [Context]: 사용자의 연령({birth_context})을 고려하여 현재 가장 고민할 법한 지점을 정확히 짚어주세요.
 4. [Highlight]: 사주풀이에서 가장 핵심이 되는 내용이나 뼈때리는 조언, 주의할 점은 반드시 마크다운 볼드체(**내용**)를 사용하여 눈에 확 띄게 강조해주세요.
 """
 
         try:
             response = self.client.models.generate_content(
-                model='gemini-2.5-flash',
+                model='gemini-3.6-flash',
                 contents=[prompt],
                 config=types.GenerateContentConfig(
                     system_instruction="당신은 팩트폭행을 날리는 20년차 MZ 무당 '연서무당'입니다. 내담자에게 직접 말하듯 대화체로 답변하며, 반드시 JSON 형식으로만 답변하고 값은 항상 문자열이어야 합니다.",
