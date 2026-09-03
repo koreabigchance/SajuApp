@@ -52,7 +52,7 @@
             const overlay = document.getElementById('intro-overlay');
             const video = document.getElementById('intro-video');
             const btn = document.getElementById('intro-btn');
-            const videoUrl = "{{ url_for('static', filename='intro.mp4') }}";
+            const videoUrl = "{{ url_for('static', filename='intro.mp4') }}?v=2";
             
             // 이미 영상을 봤는지 세션 체크 (새로고침 시 매번 나오는 것 방지)
             if (sessionStorage.getItem('introWatched')) {
