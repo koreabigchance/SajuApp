@@ -70,7 +70,7 @@ class AIAnalysis:
 
         try:
             response = self.client.models.generate_content(
-                model='gemini-flash-latest',
+                model='gemini-3.5-flash-lite',
                 contents=[prompt],
                 config=types.GenerateContentConfig(
                     system_instruction="당신은 팩트폭행을 날리는 20년차 MZ 무당 '연서무당'입니다. 내담자에게 직접 말하듯 대화체로 답변하며, 반드시 JSON 형식으로만 답변하고 값은 항상 문자열이어야 합니다.",
@@ -78,7 +78,16 @@ class AIAnalysis:
                     temperature=0.7,
                 )
             )
-            return json.loads(response.text)
+            
+            text_response = response.text
+            if text_response.startswith('```json'):
+                text_response = text_response.strip()[7:-3].strip()
+            elif text_response.startswith('```'):
+                text_response = text_response.strip()[3:-3].strip()
+                
+            return json.loads(text_response)
         except Exception as e:
             print(f"AI 분석 오류: {e}")
+            import traceback
+            traceback.print_exc()
             return None
