@@ -26,6 +26,23 @@
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
+        .mystic-character {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100px; height: 100px;
+            margin-top: -50px; margin-left: -50px;
+            border-radius: 50%;
+            z-index: 10;
+            object-fit: cover;
+            animation: bell-shake 0.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes bell-shake {
+            0% { transform: rotate(-15deg) translateY(0px) scale(1); }
+            50% { transform: rotate(15deg) translateY(-5px) scale(1.05); }
+            100% { transform: rotate(-15deg) translateY(0px) scale(1); }
+        }
+        
         .loading-text {
             font-size: 1.6rem; font-weight: 800; min-height: 4rem;
             color: #ffd700;
@@ -46,6 +63,7 @@
         <div class="mystic-circle circle-1"></div>
         <div class="mystic-circle circle-2"></div>
         <div class="mystic-circle circle-3"></div>
+        <img src="{{ url_for('static', filename='character.png') }}" class="mystic-character" alt="연서무당" onerror="this.style.display='none'">
     </div>
     
     <div style="text-align: center;">
